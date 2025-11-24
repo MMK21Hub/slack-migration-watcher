@@ -1,4 +1,4 @@
-from logging import basicConfig, debug, error, warning
+from logging import basicConfig, debug, error, info, warning
 from sys import stderr
 from time import sleep
 from traceback import format_exc
@@ -89,6 +89,7 @@ def main():
     while True:
         try:
             current_progress = fetch_progress(args.url)
+            info("Current progress = %.2f%%", current_progress * 100)
             progress_gauge.set(current_progress)
             has_had_success = True
         except Exception as e:
