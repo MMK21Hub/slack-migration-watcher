@@ -55,9 +55,10 @@ def main():
 
     while True:
         try:
-            current_progress = api.scrape_progress()
-            info("Current progress = %.2f%%", current_progress * 100)
-            progress_gauge.set(current_progress)
+            status = api.fetch_status()
+            progress_percent = status.migration_data.percent_completed
+            info("Current progress = %.2f%%", progress_percent)
+            progress_gauge.set(progress_percent / 100.0)
             has_had_success = True
         except Exception as e:
             # Exit the program if the first fetch fails
