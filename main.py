@@ -15,7 +15,7 @@ def main():
     parser.add_argument(
         "--port",
         type=int,
-        default=9000,
+        default=9070,
         help="the port to run the Prometheus exporter on",
     )
     parser.add_argument(

@@ -1,39 +1,26 @@
-# Prometheus exporter template (Python)
+# Slack Migration Watcher
 
-This is a template to make a Prometheus exporter project (like [Daydream Watcher](https://github.com/MMK21Hub/daydream-watcher)) using Python and the `prometheus_client` library.
-
-## Using this template
-
-1. On GitHub, click the green "use this template" button in the top-right
-2. Pick a repository name and description. For consistency, you should name it `*-watcher` (e.g. `core-watcher`, `daydream-watcher`)
-3. Clone and open the repository in your preferred IDE
-4. Use your IDE's global find-and-replace feature to replace all occurrences of `anything-watcher` with your chosen project slug
-5. If you're someone other than [@MMK21Hub](https://github.com/MMK21Hub), you'll probably want to update instances of `mmk21` to match your own Docker Hub account (for publishing releases)
-6. Also find-and-replace (match whole word) the port number `9000`, changing it to something custom like `9030`
-7. Delete this section and everything above it from the README, and replace it with your own project title and description
-8. Search for "TODO" across all files and address them by writing your own code
-
-## Online demo
+<!-- ## Online demo
 
 [![Screenshot of Grafana dashboard stats from the program](screenshot.png)][demo]
 
-**[🌍 View dashboard on grafana.slevel.xyz][demo]** <!-- TODO Replace the below with demo link (Grafana dashboard) -->
+**[🌍 View dashboard on grafana.slevel.xyz][demo]**
 
-[demo]: https://example.com
+[demo]: https://example.com -->
 
 ## Local development
 
-This project uses Python (3.9+) and [uv](https://docs.astral.sh/uv/) for development.
+This project uses Python (3.10+) and [uv](https://docs.astral.sh/uv/) for development.
 
 1. Clone the repo
 2. `uv run main.py`
-3. Head to <http://localhost:9000/metrics> to see the metrics
+3. Head to <http://localhost:9070/metrics> to see the metrics
 
 ## Production deployment with Docker Compose
 
 1. Download the example Compose file from [deployment/docker-compose.yml](deployment/docker-compose.yml). Feel free to adjust it to your needs.
 2. Start it with `docker compose up -d`
-3. Metrics should now be available at <http://localhost:9000/metrics>
+3. Metrics should now be available at <http://localhost:9070/metrics>
 
 ### Example `prometheus.yml` config
 
@@ -41,10 +28,10 @@ Start tracking the metrics by adding Daydream Watcher as a scrape config to a Pr
 
 ```yaml
 scrape_configs:
-  - job_name: anything-watcher
+  - job_name: slack-migration-watcher
     scrape_interval: "10s"
     static_configs:
-      - targets: ["anything-watcher:9000"]
+      - targets: ["slack-migration-watcher:9070"]
 ```
 
 <!-- ### Example Grafana dashboard
@@ -53,7 +40,7 @@ Start visualising the metrics by importing the example Grafana dashboard at [dep
 
 ## Maintainers: Releasing a new version
 
-First, check [existing tags published to Docker Hub](https://hub.docker.com/r/mmk21/anything-watcher/tags) and decide what kind of version bump to make.
+First, check [existing tags published to Docker Hub](https://hub.docker.com/r/mmk21/slack-migration-watcher/tags) and decide what kind of version bump to make.
 
 Then, use the `release-new-version.sh` shell script, e.g.
 

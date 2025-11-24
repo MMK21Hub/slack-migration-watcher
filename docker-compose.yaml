@@ -1,6 +1,6 @@
 services:
-  anything-watcher:
+  slack-migration-watcher:
     build: .
     init: true
     ports:
-      - 9000:9000
+      - 9070:9070

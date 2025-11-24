@@ -1,7 +1,7 @@
 services:
-  anything-watcher:
-    image: mmk21/anything-watcher:latest
+  slack-migration-watcher:
+    image: mmk21/slack-migration-watcher:latest
     init: true
     restart: unless-stopped
     ports:
-      - 9000:9000
+      - 9070:9070
