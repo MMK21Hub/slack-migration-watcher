@@ -7,45 +7,10 @@ from prometheus_client import start_http_server, Gauge
 from bs4 import BeautifulSoup
 import requests
 
+from api_client import AreWeThereYetAPIClient
+
 
 ARE_WE_THERE_YET = "https://are-we-there-yet.hackclub.com/"
-
-
-def fetch_progress(url: str) -> float:
-    response = requests.get(url)
-    response.raise_for_status()
-    soup = BeautifulSoup(response.text, features="html.parser")
-    debug("Fetched page: %s", response.text.replace("\n", " "))
-    progress_bar = soup.select_one("progress#progress")
-    if not progress_bar:
-        progress_bar = soup.select_one("progress")
-        if not progress_bar:
-            raise ValueError("No progress element present on page")
-        warning(
-            "Strict progressbar selector did not match; successfully fell back to generic element type selector"
-        )
-    value_str = progress_bar.get("value")
-    if value_str is None:
-        raise ValueError("Progress element has no value attribute")
-    if not isinstance(value_str, str):
-        raise ValueError(f"Unexpected type for progress value: {type(value_str)}")
-    try:
-        value = float(value_str)
-    except ValueError as e:
-        raise ValueError("Progress element value is not a number") from e
-    max_value = progress_bar.get("max") or "1"
-    if not isinstance(max_value, str):
-        raise ValueError(f"Unexpected type for progress max: {type(max_value)}")
-    try:
-        max_value_float = float(max_value)
-    except ValueError as e:
-        raise ValueError("Progress element max is not a number") from e
-    if max_value_float == 0:
-        raise ValueError("Progress element max is zero")
-
-    progress = value / max_value_float
-    debug("Parsed progress: %f (value=%f, max=%f)", progress, value, max_value_float)
-    return progress
 
 
 def main():
@@ -71,7 +36,7 @@ def main():
         "--url",
         type=str,
         default=ARE_WE_THERE_YET,
-        help="the are-we-there-yet URL to scrape data from",
+        help="the base URL for the are-we-there-yet website",
     )
     args = parser.parse_args()
     basicConfig(level=args.log_level)
@@ -86,9 +51,11 @@ def main():
         unit="ratio",
     )
 
+    api = AreWeThereYetAPIClient(args.url)
+
     while True:
         try:
-            current_progress = fetch_progress(args.url)
+            current_progress = api.scrape_progress()
             info("Current progress = %.2f%%", current_progress * 100)
             progress_gauge.set(current_progress)
             has_had_success = True

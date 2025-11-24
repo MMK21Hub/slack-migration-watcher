@@ -7,5 +7,6 @@ requires-python = ">=3.9"
 dependencies = [
     "beautifulsoup4>=4.14.2",
     "prometheus-client>=0.22.1",
+    "pydantic>=2.12.4",
     "requests>=2.32.5",
 ]
