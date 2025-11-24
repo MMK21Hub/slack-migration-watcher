@@ -14,7 +14,7 @@ ARE_WE_THERE_YET = "https://are-we-there-yet.hackclub.com/"
 def fetch_progress(url: str) -> float:
     response = requests.get(url)
     response.raise_for_status()
-    soup = BeautifulSoup(response.text)
+    soup = BeautifulSoup(response.text, features="html.parser")
     debug("Fetched page: %s", response.text.replace("\n", " "))
     progress_bar = soup.select_one("progress#progress")
     if not progress_bar:
