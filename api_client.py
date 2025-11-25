@@ -1,4 +1,5 @@
 from logging import debug, warning
+from typing import Generic, Literal, TypeVar
 from bs4 import BeautifulSoup
 from pydantic import BaseModel, field_validator
 from enum import Enum
@@ -37,15 +38,23 @@ class MigrationDetails(BaseModel):
 
 
 class MigrationData(BaseModel):
-    ok: bool
+    ok: Literal[True]
     migration_id: int
     status: MigrationStatus
     percent_completed: float  # 0.0 to 100.0
     migration_details: MigrationDetails
 
 
-class AreWeThereYetStatus(BaseModel):
-    migration_data: MigrationData
+class MigrationDataError(BaseModel):
+    ok: Literal[False]
+    error: str
+
+
+T = TypeVar("T", MigrationData, MigrationDataError)
+
+
+class StatusResponse(BaseModel, Generic[T]):
+    migration_data: T
     last_updated: datetime
 
 
@@ -91,7 +100,15 @@ class AreWeThereYetAPIClient:
         )
         return progress
 
-    def fetch_status(self) -> AreWeThereYetStatus:
-        response = requests.get(self.base_url)
+    def fetch_status(self) -> StatusResponse[MigrationData]:
+        response = requests.get(self.base_url + "/api/status")
         response.raise_for_status()
-        return AreWeThereYetStatus.model_validate_json(response.text)
+        status = StatusResponse.model_validate_json(response.text)
+        match status.migration_data:
+            case MigrationData():
+                return status
+            case MigrationDataError():
+                raise ValueError(f"API returned error: {status.migration_data.error}")
+            case _:
+                # This should never happen
+                raise TypeError("Unexpected type for migration_data")
