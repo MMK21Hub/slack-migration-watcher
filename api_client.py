@@ -8,6 +8,12 @@ from datetime import datetime, timezone
 import requests
 
 
+class APIError(Exception):
+    def __init__(self, error: str):
+        super().__init__(f"API returned error: {error}")
+        self.error = error
+
+
 class MigrationState(str, Enum):
     not_started = "not_started"
     complete = "complete"
@@ -108,7 +114,7 @@ class AreWeThereYetAPIClient:
             case MigrationData():
                 return status
             case MigrationDataError():
-                raise ValueError(f"API returned error: {status.migration_data.error}")
+                raise APIError(status.migration_data.error)
             case _:
                 # This should never happen
                 raise TypeError("Unexpected type for migration_data")
